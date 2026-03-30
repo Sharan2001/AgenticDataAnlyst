@@ -14,6 +14,5 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 apiKey = os.getenv("OPENAI_API_KEY")
 llm = OpenAI(api_key=apiKey)
 
-# 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
 def embed(text):
     return model.encode(text).tolist()
