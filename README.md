@@ -50,8 +50,8 @@ Place your database files in the `data` folder \
 data analyst/ \
 ├── app/    \
 ├── cache/  \
-├── data/   \              
-└── requirements.txt \
+├── data/   \
+└── requirements.txt 
 
 # 7. Ingest Database Schemas into Qdrant
 ```bash
