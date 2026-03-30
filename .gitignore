@@ -1,0 +1,6 @@
+venv/
+qdrant storage/
+cache/*.parquet
+temp/
+__pycache__/
+*.pyc
