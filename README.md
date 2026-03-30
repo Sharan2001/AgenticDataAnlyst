@@ -48,12 +48,12 @@ export OPENAI_API_KEY="your_api_key_here"
 Place your database files in the `data` folder \
 
 data analyst/ \
-├── app/               # Python application code \
-├── cache/             # Cache folder (excluding .parquet) \
-├── data/              # Database files \
-├── temp/              # Temporary files \
-├── qdrant_storage/    # Local Qdrant storage (ignored in git) \
-├── venv/              # Python virtual environment \
+├── app/                \
+├── cache/              \
+├── data/               \
+├── temp/               \
+├── qdrant_storage/     \
+├── venv/               \
 └── requirements.txt \
 
 # 7. Ingest Database Schemas into Qdrant
