@@ -44,7 +44,7 @@ pip freeze > requirements.txt
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
 ```
-# 6. Add Your Database Files
+## 6. Add Your Database Files
 Place your database files in the `data` folder \
 
 data analyst/ \
@@ -53,13 +53,13 @@ data analyst/ \
 ├── data/   \
 └── requirements.txt 
 
-# 7. Ingest Database Schemas into Qdrant
+## 7. Ingest Database Schemas into Qdrant
 ```bash
 python app/ingest_schema.py
 ```
-# 8. Run the App
+## 8. Run the App
 ```bash
 uvicorn app.main:app --reload
 ```
-# Open your browser at http://127.0.0.1:8000/docs and use the GET tab to test prompts
+### Open your browser at http://127.0.0.1:8000/docs and use the GET tab to test prompts
 
