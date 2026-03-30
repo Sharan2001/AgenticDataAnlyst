@@ -45,15 +45,16 @@ pip freeze > requirements.txt
 export OPENAI_API_KEY="your_api_key_here"
 ```
 # 6. Add Your Database Files
-Place your database files in the `data` folder
-data analyst/
-├── app/               # Python application code
-├── cache/             # Cache folder (excluding .parquet)
-├── data/              # Database files
-├── temp/              # Temporary files
-├── qdrant_storage/    # Local Qdrant storage (ignored in git)
-├── venv/              # Python virtual environment
-└── requirements.txt
+Place your database files in the `data` folder \
+
+data analyst/ \
+├── app/               # Python application code \
+├── cache/             # Cache folder (excluding .parquet) \
+├── data/              # Database files \
+├── temp/              # Temporary files \
+├── qdrant_storage/    # Local Qdrant storage (ignored in git) \
+├── venv/              # Python virtual environment \
+└── requirements.txt \
 
 # 7. Ingest Database Schemas into Qdrant
 ```bash
