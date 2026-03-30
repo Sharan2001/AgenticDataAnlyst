@@ -11,7 +11,7 @@ client = QdrantClient(
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 #llm = pipeline(task="text2text-generation", model="google/flan-t5-small")  # Using a smaller model for faster generation
-apiKey = os.getenv("YOUR_OPENAI_API_KEY")
+apiKey = os.getenv("OPENAI_API_KEY")
 llm = OpenAI(api_key=apiKey)
 
 def embed(text):
