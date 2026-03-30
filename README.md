@@ -50,10 +50,7 @@ Place your database files in the `data` folder \
 data analyst/ \
 ├── app/                \
 ├── cache/              \
-├── data/               \
-├── temp/               \
-├── qdrant_storage/     \
-├── venv/               \
+├── data/               \              
 └── requirements.txt \
 
 # 7. Ingest Database Schemas into Qdrant
