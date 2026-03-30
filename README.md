@@ -48,9 +48,9 @@ export OPENAI_API_KEY="your_api_key_here"
 Place your database files in the `data` folder \
 
 data analyst/ \
-├── app/                \
-├── cache/              \
-├── data/               \              
+├── app/    \
+├── cache/  \
+├── data/   \              
 └── requirements.txt \
 
 # 7. Ingest Database Schemas into Qdrant
