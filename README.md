@@ -4,6 +4,8 @@ This project provides a local setup for a Qdrant-based data ingestion and query 
 
 ---
 
+Note: Still wokring on this. Not completed yet.
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
