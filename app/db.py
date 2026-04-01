@@ -26,7 +26,6 @@ def generate_schema_docs(db_path: str) -> list[str]:
 #     sql_lower = sql_query.lower()
 
 #     if " join " not in sql_lower:
-#         print("No JOIN detected, skipping unqualified column check.")
 #         return True
 
 #     tokens = sql_query.replace(",", " ").split()
@@ -42,7 +41,6 @@ def generate_schema_docs(db_path: str) -> list[str]:
 
 #         # detect column without table alias
 #         if "." not in token and token.isidentifier():
-#             print(f"Unqualified column detected: {token}")
 #             return False
 
 #     return True
