@@ -1,26 +1,53 @@
 from app.db import run_query
 from app.vector_loader import get_vector
 from app.loader import llm
+from app.texts import rules,output_format
+import json
 
-def generate_sql(question, schema_context,error):
+chat_state = {
+    "last_question": None,
+    "last_sql": None,
+    "last_schema": None,
+    "history": []
+}
+def question_classification(query):
     prompt = f"""
-    You are a data analyst.
+    Classify the query as:
+    - NEW_QUESTION
+    - FOLLOW_UP
 
-    Relevant schema:
-    {schema_context}
+    Query: {query}
 
-    Convert this question into SQL:
-    {question}
-
-    Currently there is {error} errors(s).
-
-    Only return SQL query. Do not include any explanations. The answer must be just the query. 
-    It must only be a Select query. No other SQL commands are allowed. Do not include any comments in the SQL.
-    Do not add ````sql` code block markers. I want a perfect and precise SQL query without any explanations or apologies.
-    It could be complex with multiple joins, but it should be correct and executable on the database with the above schema. 
-    It might not involve joins, so dont simply make it complex unless it has to be.
-    If the question is ambiguoud just ask for clarification instead of making assumptions. Do not make any assumptions. If you dont know the answer, just say you dont know. Do not try to make up an answer.
+    Answer only one word.
     """
+    response = llm.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You classify user queries into NEW_QUERY or FOLLOW_UP."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+    return response.choices[0].message.content.strip()
+
+def generate_sql_new(question, schema_context):
+    prompt = f"""You are a senior data analyst.
+
+        Relevant schema: It is of the format [{{table_name: [column1, column2, column3...]}}]
+        {schema_context}
+
+        User query will be about analyzing the data in the database with the above schema. It could be about finding trends, making comparisons, looking up specific values or performing aggregations.
+
+        User query: 
+        {question}
+
+
+        Rules:
+        {rules}
+
+        Output format:
+        {output_format}
+        """
 
     response = llm.chat.completions.create(
         model="gpt-4o-mini",
@@ -30,18 +57,49 @@ def generate_sql(question, schema_context,error):
         ],
         temperature=0
     )
-    return response.choices[0].message.content.strip()
+    return json.loads(response.choices[0].message.content.strip())
 
-def generate_response(query):
-    result = run_query(query)
+def generate_sql_followup(question, chat_state):
+    prompt = f"""You are a senior data analyst.
+
+        The user has already asked a question and you generated SQL for it. The user is now asking a follow-up question to fix the error/or make a modification to the previous question.
+        Analyze the error(if any) and fix the SQL accordingly.
+
+        Here is the previous question and the SQL you generated for it:
+        Previous question: {chat_state['last_question']}
+        Generated SQL: {chat_state['last_sql']}
+        Error from executing SQL: {chat_state['history'][-1]['error']}
+        Relevant schema: {chat_state['last_schema']} - It is of the format [{{table_name: [column1, column2, column3...]}}]
+        Now the user is asking this follow-up question:
+        Follow-up question: {question}
+
+        Rules:
+        {rules}
+        
+        Output format:
+        {output_format}
+        """
+
+    response = llm.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You generate SQL queries only."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+    return json.loads(response.choices[0].message.content.strip())
+
+def generate_response(sql_query,db_name):
+    result = run_query(sql_query,db_name)
     if result['Success']:
         return {
-            "result": result['Data']
+            "result": [i for i in result['Data']]
         }
     else:
         return {
-            "Error executing SQL": result['Error']
-         }
+            "Error executing SQL": [i for i in result['Error']]
+        }
     
         # Add regeneration logic here
 
@@ -49,11 +107,29 @@ def generate_response(query):
         # print("Regenerating SQL...")
         # agent_pipeline(query, result['Error'])
 
-def agent_pipeline(query,error):
-    schema_context = get_vector(query)
+def agent_pipeline(question,error,db_name):
+    question_type = question_classification(question)
 
-    sql = generate_sql(query, schema_context,error)
-    sql = sql.strip().split(";")[0] + ";" # Ensure only one statement and ends with a semicolon
-    print("Generated SQL:", sql)
+    if question_type == "NEW_QUESTION" or not chat_state["last_question"]:  
+        print("New Question")
+        schema_context = get_vector(question,db_name)
+        print("Schema context fetched:", schema_context)
+        chat_state["last_schema"] = schema_context
+        response = generate_sql_new(question, schema_context)
+    else:
+        print("Follow-up Question")
+        response = generate_sql_followup(question, chat_state)  
 
-    return generate_response(sql)
+    sql_query = []
+    for query in response['sql']:
+        sql_query.append(query.strip().split(";")[0] + ";") # Ensure only one statement and ends with a semicolon
+        chat_state["last_sql"] = sql_query
+    
+    chat_state["last_question"] = question
+    chat_state["history"].append({"question": question, "sql": sql_query, "error": error})
+
+    print("Intent:", response['intent'],"\n")
+    print("Generated SQL:", sql_query,"\n")
+    print("Explanation:", response['explanation'])
+
+    return generate_response(sql_query,db_name)

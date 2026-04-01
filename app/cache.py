@@ -4,10 +4,10 @@ import pandas as pd
 
 CACHE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIR = os.path.join(CACHE_DIR, "..", "cache")
-CACHE_FILE = os.path.join(CACHE_DIR, "data_cache.parquet")
 TTL_SECONDS = 300  
 
-def is_cache_valid():
+def is_cache_valid(db_name):
+    CACHE_FILE = os.path.join(CACHE_DIR, f"{db_name}_cache.parquet")
     if not os.path.exists(CACHE_FILE):
         return False
     
@@ -15,11 +15,13 @@ def is_cache_valid():
     age = time.time() - last_modified
     return age < TTL_SECONDS
 
-def load_cache():
+def load_cache(db_name):
+    CACHE_FILE = os.path.join(CACHE_DIR, f"{db_name}_cache.parquet")
     df = pd.read_parquet(CACHE_FILE)
     return df.to_string(index=False)
 
-def save_cache(data):
+def save_cache(data, db_name):
+    CACHE_FILE = os.path.join(CACHE_DIR, f"{db_name}_cache.parquet")
     cleaned_data = []
     for point in data:
         if hasattr(point, "payload"):

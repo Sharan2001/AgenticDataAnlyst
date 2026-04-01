@@ -1,5 +1,5 @@
 venv/
-qdrant storage/
+qdrant_storage/
 cache/*.parquet
 temp/
 __pycache__/
