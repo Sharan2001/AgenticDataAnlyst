@@ -55,11 +55,7 @@ data analyst/ \
 ├── data/   \
 └── requirements.txt 
 
-## 7. Ingest Database Schemas into Qdrant
-```bash
-python app/ingest_schema.py
-```
-## 8. Run the App
+## 7. Run the App
 ```bash
 uvicorn app.main:app --reload
 ```
