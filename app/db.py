@@ -1,27 +1,5 @@
 import sqlite3
-
-conn = sqlite3.connect("data/sample.db")
-
-def init_db():
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS sales (
-        id INTEGER PRIMARY KEY,
-        date TEXT,
-        revenue REAL,
-        region TEXT
-    )
-    """)
-
-    cursor.execute("""
-    INSERT INTO sales (date, revenue, region) VALUES
-    ('2024-01-01', 1000, 'North'),
-    ('2024-02-01', 1500, 'South'),
-    ('2024-03-01', 2000, 'North')
-    """)
-
-    conn.commit()
+import sqlparse
 
 def generate_schema_docs(db_path: str) -> list[str]:
     conn = sqlite3.connect(db_path)
@@ -36,18 +14,60 @@ def generate_schema_docs(db_path: str) -> list[str]:
         cursor.execute(f"PRAGMA table_info({table});")
         columns = [col[1] for col in cursor.fetchall()]  # col[1] is the column name
         columns_str = ", ".join(columns)
-        # Optional: you can add your own descriptions for tables
         doc = f"Table: {table}, Columns: {columns_str}"
         schema_docs.append(doc)
     
     conn.close()
     return schema_docs
 
+
+def is_safe_query(sql: str) -> bool:
+    # FORBIDDEN = ["drop", "delete", "update", "insert", "alter", "truncate"]
+    # sql_lower = sql.lower()
+    
+    # if not sql_lower.strip().startswith("select"):
+    #     return False
+    
+    # for word in FORBIDDEN:
+    #     if word in sql_lower:
+    #         return False
+    # return True
+    #sql = sql.lower()
+    parsed = sqlparse.parse(sql)
+    if not parsed:
+        return False
+
+    stmt = parsed[0]
+    return stmt.get_type() == "SELECT"
+    
+    
+
 def run_query(sql):
-    # create a new connection for this request
-    conn = sqlite3.connect("/Users/sharanshivram/Projects/Agents/Data Analyst/data/sample2.db")  # your local DB file
+    db_file = "/Users/sharanshivram/Projects/Agents/Data Analyst/data/sample2.db"
+    conn = sqlite3.connect(f"file:{db_file}?mode=ro", uri=True)  # your local DB file
     cursor = conn.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    conn.close()  # close the connection
-    return result
+    if is_safe_query(sql):
+        try:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            result = {"columns": columns, "rows": rows}
+            conn.close()  # close the connection
+            return {
+                'Success': True,
+                'Data': result,
+                'Error': None
+            }
+        except Exception as e:
+            return {
+                'Success': False,
+                'Data': None,
+                'Error': str(e)
+            }
+        
+    else:
+        return {
+                'Success': False,
+                'Data': None,
+                'Error': "Unsafe query detected. Only SELECT statements are allowed."
+            } 
