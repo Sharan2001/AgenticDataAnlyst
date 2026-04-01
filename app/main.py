@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from app.agent import agent_pipeline
 import time
 
-# We intercept the 'loky' module before any library can use it
 app = FastAPI()
 @app.get("/analyze")
 def analyze(question: str, db_name: str):
