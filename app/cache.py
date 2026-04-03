@@ -4,7 +4,7 @@ import pandas as pd
 
 CACHE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIR = os.path.join(CACHE_DIR, "..", "cache")
-TTL_SECONDS = 300  
+TTL_SECONDS = 600  
 
 def is_cache_valid(db_name):
     CACHE_FILE = os.path.join(CACHE_DIR, f"{db_name}_cache.parquet")

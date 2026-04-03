@@ -73,7 +73,7 @@ def is_safe_query(sql_query) -> bool:
     
 
 def run_query(sql_query,db_name):
-    db_file = f"/data/{db_name}.db"
+    db_file = f"data/{db_name}.db"
     conn = sqlite3.connect(f"file:{db_file}?mode=ro", uri=True)  # your local DB file
     cursor = conn.cursor()
     response = {

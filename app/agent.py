@@ -8,8 +8,11 @@ chat_state = {
     "last_question": None,
     "last_sql": None,
     "last_schema": None,
-    "history": []
+    "last_error": None
 }
+
+chat_history={}
+
 def question_classification(query):
     prompt = f"""
     Classify the query as:
@@ -68,7 +71,7 @@ def generate_sql_followup(question, chat_state):
         Here is the previous question and the SQL you generated for it:
         Previous question: {chat_state['last_question']}
         Generated SQL: {chat_state['last_sql']}
-        Error from executing SQL: {chat_state['history'][-1]['error']}
+        Error from executing SQL: {chat_state['last_error']}
         Relevant schema: {chat_state['last_schema']} - It is of the format [{{table_name: [column1, column2, column3...]}}]
         Now the user is asking this follow-up question:
         Follow-up question: {question}
@@ -124,12 +127,23 @@ def agent_pipeline(question,error,db_name):
     for query in response['sql']:
         sql_query.append(query.strip().split(";")[0] + ";") # Ensure only one statement and ends with a semicolon
         chat_state["last_sql"] = sql_query
+
+    # print("Intent:", response['intent'],"\n")
+    # print("Generated SQL:", sql_query,"\n")
+    # print("Explanation:", response['explanation'])
+
     
     chat_state["last_question"] = question
-    chat_state["history"].append({"question": question, "sql": sql_query, "error": error})
+    chat_state["last_error"] = error
 
-    print("Intent:", response['intent'],"\n")
-    print("Generated SQL:", sql_query,"\n")
-    print("Explanation:", response['explanation'])
+    result=generate_response(sql_query,db_name)
 
-    return generate_response(sql_query,db_name)
+    if db_name not in chat_history:
+        chat_history[db_name] = []
+    chat_history[db_name].append({"role": "user", "content": question})
+    chat_history[db_name].append({"role": "agent", "content": result})
+    # return result
+    return [
+        {"role": "user", "content": question},
+        {"role": "agent", "content": result}
+    ]

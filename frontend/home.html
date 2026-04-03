@@ -1,0 +1,58 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>DB Analyzer</title>
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Upload DB</h2>
+
+  <input type="file" id="dbFile">
+  <button onclick="uploadDB()">Upload</button>
+
+  <hr>
+
+  <h3>Ask Question</h3>
+
+  <select id="dbDropdown"></select>
+
+  <textarea id="question" placeholder="Ask something..."></textarea>
+
+  <button onclick="submitQuery()">Run</button>
+
+  <div id="result"></div>
+</div>
+
+<script src="/frontend/home.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DB Analyzer Chat</title>
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+
+<div class="chat-container">
+  <h2>Agentic Data Analyst</h2>
+
+  <div id="chat-window" class="chat-window">
+    <!-- Chat messages will appear here -->
+  </div>
+
+  <input type="file" id="dbFile" />
+  <button class="upload-btn" id="upload-btn" onclick="uploadDB()">Upload DB</button>
+  <select id="dbDropdown"></select>
+
+  <textarea id="question" placeholder="Ask a question..."></textarea>
+  <button id="submit" onclick="submitQuery()">Send</button>
+</div>
+
+<script src="/frontend/home.js"></script>
+</body>
+</html>
