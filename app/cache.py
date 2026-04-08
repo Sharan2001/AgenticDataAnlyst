@@ -33,4 +33,3 @@ def save_cache(data, db_name):
 
     df = pd.DataFrame(cleaned_data)
     df.to_parquet(CACHE_FILE, index=False) 
-    print("Cache saved to data_cache.parquet") 
